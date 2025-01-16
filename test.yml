@@ -1,0 +1,21 @@
+
+name:  Scheduled Workflow
+
+on:
+  schedule:
+    - cron: '30 23 * * *'
+
+jobs:
+  
+  example_job:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+         ref: ${{ github.event.inputs.branch || 'test' }}
+
+    - name: Run a script
+      run: echo "This is a scheduled job running at 11:30 PM daily"
