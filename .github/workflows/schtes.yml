@@ -1,0 +1,20 @@
+name: Build-Deploy-DEV
+
+on:
+  schedule:
+    - cron: '35 12 * * *'  # This will run the workflow daily at 20:00 UTC
+  push:
+    branches:
+      - test
+
+jobs:
+  DEV-Cd-Build:
+    if: github.ref == 'refs/heads/test'
+    runs-on: windows-latest
+    name: Run DEV CD Build
+
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v3
+      with:
+        ref: 'test'
