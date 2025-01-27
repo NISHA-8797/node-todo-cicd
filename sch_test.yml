@@ -8,7 +8,7 @@ on:
       - test
 
 jobs:
-  DEV-Cd-Build:
+  DEV-CD-Build:
     if: github.ref == 'refs/heads/test'
     runs-on: windows-latest
     name: Run DEV CD Build
