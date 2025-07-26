@@ -1,0 +1,51 @@
+name: Auto Merge Branch A to B
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: 'Source branch'
+        required: true
+        default: 'branch-a'
+      target_branch:
+        description: 'Target branch'
+        required: true
+        default: 'branch-b'
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout target branch
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.target_branch }}
+        fetch-depth: 0  # Fetch full history for merging
+
+    - name: Configure Git
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+
+    - name: Add source branch
+      run: |
+        git fetch origin ${{ github.event.inputs.source_branch }}:${{ github.event.inputs.source_branch }}
+
+    - name: Merge source branch into target branch
+      id: merge
+      run: |
+        set -e
+        git merge origin/${{ github.event.inputs.source_branch }} --no-ff || echo "::set-output name=conflict::true"
+
+    - name: Check for merge conflict
+      if: steps.merge.outputs.conflict == 'true'
+      run: |
+        echo "⚠️ Merge conflict detected. Please resolve manually."
+        exit 1
+
+    - name: Push merged changes
+      if: steps.merge.outputs.conflict != 'true'
+      run: |
+        git push origin ${{ github.event.inputs.target_branch }}
+        echo "✅ Merge completed successfully."
