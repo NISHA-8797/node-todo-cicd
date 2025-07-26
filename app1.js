@@ -1,5 +1,5 @@
-git checkout -b master
-echo "console.log('Hello from main');" > app1.js
-git add app1.js
-git commit -m "Initial commit"
-git push origin master
+git checkout master
+git checkout -b geny
+echo "console.log('changes from branch geny');" > app1.js
+git commit -am "Update app1.js in geny branch"
+git push origin geny
