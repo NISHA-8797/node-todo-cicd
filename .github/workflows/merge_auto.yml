@@ -39,7 +39,7 @@ jobs:
           else
             echo "Branch does not exist. Will create."
             echo "EXISTS=false" >> $GITHUB_ENV
-
+          fi
       - name: Checkout target branch
         if: env.EXISTS == 'false'
         uses: actions/checkout@v4
