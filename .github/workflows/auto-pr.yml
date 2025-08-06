@@ -22,16 +22,16 @@ create-auto-pr:
           -H "Authorization: token $GH_TOKEN" \
           -H "Accept: application/vnd.github+json" \
           -d @- <<EOF
-        {
+         {
           "title": "PR: Merge '$SOURCE_BRANCH' into '$TARGET_BRANCH'",
           "head": "$SOURCE_BRANCH",
           "base": "$TARGET_BRANCH",
           "body": "This PR was automatically created by GitHub Actions."
-        }
+         }
 EOF
-        )
+         ) 
 
-        echo "$PR_RESPONSE" | jq
+         echo "$PR_RESPONSE" | jq
 
         PR_URL=$(echo "$PR_RESPONSE" | jq -r '.html_url')
         PR_NUMBER=$(echo "$PR_RESPONSE" | jq -r '.number')
