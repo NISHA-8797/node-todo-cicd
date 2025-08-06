@@ -142,25 +142,9 @@ approval-2:
     environment:
       name: merge-approval
       #url: https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }}
-
     steps:
       - run: echo "Awaiting final approval to merge source → feature branch."
-
-  merge-dev-pr:
+      
     if: inputs.Deployto == 'dev'
-    name: Merge Source → Feature Branch
-    needs: create-pr
-    runs-on: ubuntu-latest
-    steps:
-      - name: Merge the PR
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const prNumber = process.env.PR_NUMBER;
-            const result = await github.rest.pulls.merge({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-              merge_method: "merge"
             });
-            console.log("✅ Merged source → feature:", result.data.merged);
+            console.log("✅ Merged source → feature:"
