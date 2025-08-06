@@ -12,7 +12,7 @@ on:
         required: true
         type: string
 env:       
- GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+ GH_TOKEN: ${{ github.token }}
 jobs:
   create-pr:
     runs-on: ubuntu-latest
@@ -23,7 +23,7 @@ jobs:
 
       - name: Create Pull Request
         env:
-          GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
         run: |
           gh pr create \
             --title "Auto PR: ${{ inputs.source_branch }} to ${{ inputs.target_branch }}" \
