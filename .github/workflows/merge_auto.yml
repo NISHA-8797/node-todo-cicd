@@ -91,6 +91,7 @@ jobs:
 
   merge:
     runs-on: ubuntu-latest
+    needs: create-feature-branch-from-target-branch
     steps:
     - name: Checkout target branch
       uses: actions/checkout@v4
@@ -124,7 +125,7 @@ jobs:
       run: |
         git push origin ${{ github.event.inputs.target_branch }}
         echo "✅ Merge completed successfully."
-  approval_Required:
+  Approve_code_review:
     runs-on: ubuntu-latest
     needs: merge
     environment:
@@ -135,7 +136,7 @@ jobs:
 
   approval-2:
     name: Approval 2 - Merge Source into Feature
-    needs: approval_Required
+    needs: Approve_code_review
     runs-on: ubuntu-latest
     environment:
       name: merge-approval
