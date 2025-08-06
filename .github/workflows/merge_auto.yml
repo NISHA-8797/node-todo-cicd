@@ -21,7 +21,7 @@ permissions:
   contents: write
   pull-requests: write
 env:
-  FEATURE_BRANCH: feature-geny_$(date +%F)
+  FEATURE_BRANCH: feature-genx-geny-merge
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   create-feature-branch-from-target-branch:
