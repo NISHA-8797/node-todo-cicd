@@ -22,7 +22,7 @@ permissions:
   pull-requests: write
 env:
   FEATURE_BRANCH: feature-genx-geny-merge
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 jobs:
   create-feature-branch-from-target-branch:
       if: inputs.Deployto == 'dev'
@@ -65,28 +65,29 @@ jobs:
          git checkout -b $FEATURE_BRANCH
          git push origin $FEATURE_BRANCH
 
-  create-pr:
-   if: inputs.Deployto == 'dev'
-   name: Create PR from source → feature
-   needs: create-feature-branch-from-target-branch
+  create-pr-using-api:
+   name: Create PR from genx → feature
+   needs:   create-feature-branch-from-target-branch
    runs-on: ubuntu-latest
-   outputs:
-     pr_number: ${{ steps.create_pr.outputs.pr_number }}
+   if: inputs.Deployto == 'dev'
    steps:
-     - name: Create Pull Request
-       id: create_pr
-       run: |
-         curl -s -X POST https://api.github.com/repos/${{ github.repository }}/pulls \
-          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -H "Accept: application/vnd.github+json" \
-          -d @- <<EOF
-         {
-          "title": "PR: Merge 'genx' into '${FEATURE_BRANCH}'",
-          "head": "genx",
-          "base": "${FEATURE_BRANCH}",
-          "body": "Auto-created PR to merge genx → ${FEATURE_BRANCH}"
-         }
-         EOF
+    - name: Create PR using GitHub API
+      id: create_pr
+      uses: actions/github-script@v7
+      env:
+        FEATURE_BRANCH: ${{ env.FEATURE_BRANCH }}
+      with:
+        github-token: ${{ secrets.PERSONAL_TOKEN }}
+        script: |
+          const { data: pullRequest } = await github.rest.pulls.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            head: 'genx',  // source branch
+            base: process.env.FEATURE_BRANCH,  // target branch
+            title: `PR: Merge 'genx' into '${process.env.FEATURE_BRANCH}'`,
+            body: `Merging source branch into feature branch based on target '${{ github.event.inputs.target_branch }}'`,
+          });
+          core.setOutput("pr_number", pullRequest.number);
 
   check-mergeability-dev:
     if: inputs.Deployto == 'dev'
