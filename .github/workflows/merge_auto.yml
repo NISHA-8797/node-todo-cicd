@@ -101,7 +101,6 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: GET /repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}
-        env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 
       - name: Fail on conflict
