@@ -1,20 +1,44 @@
 name: Auto-PR
 on:
   workflow_dispatch:
+       inputs:
+        source_branch:
+         description: 'Source branch (head)'
+         required: true
+         type: string
+        target_branch:
+         description: 'Target branch (base)'
+         required: true
+         type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+env:
+  FEATURE_BRANCH: feature-genx-geny-merge
 jobs: 
   create-pr:
    runs-on: ububtu-latest
    steps:
-    - name: checkout geny branch
+    - name: checkout geny-feature branch
       uses: actions/checkout@v4
       with:
-        ref: geny
+        ref: ${{ env.FEATURE_BRANCH }}
         fetch-depth: 0
         token: $((secrets.PERSONAL_TOKEN }}
-    - name: merge genx to feature geny
+    - name: Configure Git
       run: |
-        git fetch origin genx
-        git merge origin/genx || true
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+
+    - name: Add source branch
+      run: |
+        git fetch origin ${{ github.event.inputs.source_branch }}:${{ github.event.inputs.source_branch }}
+    - name: merge genx to feature geny
+      id: merge
+      run: |
+        set -e
+        git merge origin/${{ github.event.inputs.source_branch }} --no-ff || echo "::set-output name=conflict::true"
     - name: create-pr
       uses: peter-evans/create-pull-request@v6
       with:
