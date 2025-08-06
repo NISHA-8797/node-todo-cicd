@@ -22,7 +22,7 @@ permissions:
   pull-requests: write
 env:
   FEATURE_BRANCH: feature-genx-geny-merge
-  GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+  GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 jobs:
   create-feature-branch-from-target-branch:
       if: inputs.Deployto == 'dev'
@@ -77,7 +77,7 @@ jobs:
       env:
         FEATURE_BRANCH: ${{ env.FEATURE_BRANCH }}
       with:
-        github-token: ${{ secrets.PERSONAL_TOKEN }}
+        GH-token: ${{ secrets.PERSONAL_TOKEN }}
         script: |
           const { data: pullRequest } = await github.rest.pulls.create({
             owner: context.repo.owner,
@@ -101,7 +101,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: GET /repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+          GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 
       - name: Fail on conflict
         run: |
