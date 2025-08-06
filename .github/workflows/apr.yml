@@ -1,0 +1,25 @@
+name: Auto-PR
+on:
+  workflow_dispatch:
+jobs: 
+  create-pr:
+   runs-on: ububtu-latest
+   steps:
+    - name: checkout geny branch
+      uses: actions/checkout@v4
+      with:
+        ref: geny
+        fetch-depth: 0
+        token: $((secrets.PERSONAL_TOKEN }}
+    - name: merge genx to geny
+      run: |
+        git fetch origin genx
+        git merge origin/genx || true
+    - name: create-pr
+      uses: peter-evans/create-pull-request@v6
+      with:
+       token : $ {{ secrets.PERSONAL_TOKEN }}
+       commit-message: 'merge genx to geny'
+       title: 'Automated PR'
+       branch:
+        
