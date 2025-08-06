@@ -17,7 +17,6 @@ permissions:
 env:
   FEATURE_BRANCH: feature-geny_${{ github.run_id }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  PR_NUMBER: ${{ env.PR_NUMBER }}
 jobs:
   create-feature-branch-and-dev-pr:
     if: inputs.Deployto == 'dev'
@@ -53,19 +52,27 @@ jobs:
           git checkout -b $FEATURE_BRANCH
           git push origin $FEATURE_BRANCH
 
-      - name: Create PR from source → feature
-        id: create_pr
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: ${{ env.FEATURE_BRANCH }}
-          head: ${{ github.event.inputs.source_branch }}
-          title: "PR: Merge '${{ github.event.inputs.source_branch }}' into '${{ env.FEATURE_BRANCH }}'"
-          body: |
-            Merging source branch into feature branch based on target `${{ github.event.inputs.target_branch }}`.
+  create-pr:
+   name: Create PR from source → feature
+   runs-on: ubuntu-latest
+   outputs:
+     pr_number: ${{ steps.save_pr.outputs.pr_number }}
+   steps:
+    - name: Create Pull Request
+      id: create_pr
+      uses: peter-evans/create-pull-request@v6
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        base: ${{ env.FEATURE_BRANCH }}
+        head: ${{ github.event.inputs.source_branch }}
+        title: "PR: Merge '${{ github.event.inputs.source_branch }}' into '${{ env.FEATURE_BRANCH }}'"
+        body: |
+          Merging source branch into feature branch based on target `${{ github.event.inputs.target_branch }}`.
 
-      - name: Save PR number
-        run: echo "PR_NUMBER=${{ steps.create_pr.outputs.pull-request-number }}" >> $GITHUB_ENV
+    - name: Save PR number
+      id: save_pr
+      run: echo "::set-output name=pr_number::${{ steps.create_pr.outputs.pull-request-number }}"    
+      
 
   check-mergeability-dev:
     if: inputs.Deployto == 'dev'
@@ -116,7 +123,7 @@ jobs:
   merge-dev-pr:
     if: inputs.Deployto == 'dev'
     name: Merge Source → Feature Branch
-    needs: approval-dev-2
+    needs: create-pr
     runs-on: ubuntu-latest
     steps:
       - name: Merge the PR
