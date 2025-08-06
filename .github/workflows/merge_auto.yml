@@ -66,29 +66,32 @@ jobs:
          git push origin $FEATURE_BRANCH
 
   create-pr:
-   name: Create PR from genx → feature
-   needs:   create-feature-branch-from-target-branch
-   runs-on: ubuntu-latest
    if: inputs.Deployto == 'dev'
+   name: Create PR from source → feature
+   needs: create-feature-branch-from-target-branch
+   runs-on: ubuntu-latest
+   outputs:
+     pr_number: ${{ steps.save_pr.outputs.pr_number }}
    steps:
-    - name: Create PR using GitHub API
-      id: create_pr
-      uses: actions/github-script@v7
-      env:
-        FEATURE_BRANCH: ${{ env.FEATURE_BRANCH }}
+    - name: checkout source branch
+      uses: actions/checkout@v4
       with:
-        GH-token: ${{ secrets.PERSONAL_TOKEN }}
-        script: |
-          const { data: pullRequest } = await github.rest.pulls.create({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            head: 'genx',  // source branch
-            base: process.env.FEATURE_BRANCH,  // target branch
-            title: `PR: Merge 'genx' into '${process.env.FEATURE_BRANCH}'`,
-            body: `Merging source branch into feature branch based on target '${{ github.event.inputs.target_branch }}'`,
-          });
-          core.setOutput("pr_number", pullRequest.number);
+        ref : ${{ github.event.inputs.source_branch }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create Pull Request
+      id: create_pr
+      uses: peter-evans/create-pull-request@v6
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        base: ${{ env.FEATURE_BRANCH }}
+        title: "PR: Merge '${{ github.event.inputs.source_branch }}' into '${{ env.FEATURE_BRANCH }}'"
+        body: |
+          Merging source branch into feature branch based on target `${{ github.event.inputs.target_branch }}`.
 
+    - name: Save PR number
+      id: save_pr
+      run: echo "::set-output name=pr_number::${{ steps.create_pr.outputs.pull-request-number }}" 
+      
   merge:
     runs-on: ubuntu-latest
     needs: create-feature-branch-from-target-branch
