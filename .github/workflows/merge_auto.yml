@@ -78,16 +78,18 @@ jobs:
        uses: actions/github-script@v7
        with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const { data: pullRequest } = await github.rest.pulls.create({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            head: 'genx',  // source branch
-            base: process.env.FEATURE_BRANCH,  // target branch
-            title: `PR: Merge 'genx' into '${process.env.FEATURE_BRANCH}'`,
-            body: `Merging source branch into feature branch based on target '${{ github.event.inputs.target_branch }}'`,
-          });
-          core.setOutput("pr_number", pullRequest.number);
+        run: |
+         curl -s -X POST https://api.github.com/repos/${{ github.repository }}/pulls \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github+json" \
+          -d @- <<EOF
+         {
+          "title": "PR: Merge 'genx' into '${FEATURE_BRANCH}'",
+          "head": "genx",
+          "base": "${FEATURE_BRANCH}",
+          "body": "Auto-created PR to merge genx → ${FEATURE_BRANCH}"
+         }
+         EOF
 
   check-mergeability-dev:
     if: inputs.Deployto == 'dev'
