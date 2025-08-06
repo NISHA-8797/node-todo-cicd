@@ -16,6 +16,8 @@ permissions:
   pull-requests: write
 env:
   FEATURE_BRANCH: feature-geny_${{ github.run_id }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PR_NUMBER: ${{ env.PR_NUMBER }}
 jobs:
   create-feature-branch-and-dev-pr:
     if: inputs.Deployto == 'dev'
@@ -129,6 +131,3 @@ jobs:
               merge_method: "merge"
             });
             console.log("✅ Merged source → feature:", result.data.merged);
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ env.PR_NUMBER }}
