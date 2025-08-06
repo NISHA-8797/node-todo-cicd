@@ -11,7 +11,7 @@ on:
         description: 'Target branch (e.g., Branch B)'
         required: true
         default: 'branch-b'
-      Deploy-to:
+      Deployto:
         type: environment
         description: 'Environment to deploy to (dev or qa)'
         required: true
@@ -24,7 +24,7 @@ env:
   FEATURE_BRANCH: feature-geny_${{ github.run_id }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
-  create-feature-branch-and-dev-pr:
+  create-feature-branch-from-target-branch:
     if: inputs.Deployto == 'dev'
     name: Setup Feature Branch and PR (Dev)
     runs-on: ubuntu-latest
@@ -59,6 +59,7 @@ jobs:
           git push origin $FEATURE_BRANCH
 
   create-pr:
+   if: inputs.Deployto == 'dev'
    name: Create PR from source → feature
    runs-on: ubuntu-latest
    outputs:
@@ -83,7 +84,7 @@ jobs:
   check-mergeability-dev:
     if: inputs.Deployto == 'dev'
     name: Check Merge Conflicts (Dev)
-    needs: create-feature-branch-and-dev-pr
+    needs: create-feature-branch-from-target-branch
     runs-on: ubuntu-latest
 
     steps:
