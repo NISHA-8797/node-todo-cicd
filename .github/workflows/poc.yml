@@ -1,0 +1,56 @@
+name: Create Pull Request
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: 'Source branch'
+        required: true
+        default: 'feature-branch'
+      target_branch:
+        description: 'Target branch'
+        required: true
+        default: 'main'
+      pr_title:
+        description: 'Pull request title'
+        required: true
+        default: 'Automated PR from feature-branch'
+      pr_body:
+        description: 'Pull request body'
+        required: false
+        default: 'This PR was created automatically using a workflow.'
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Pull Request via GitHub API
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { source_branch, target_branch, pr_title, pr_body } = inputs;
+            try {
+              const response = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: pr_title,
+                head: source_branch,
+                base: target_branch,
+                body: pr_body
+              });
+              core.info(`✅ Pull request created: ${response.data.html_url}`);
+            } catch (error) {
+              if (error.status === 422) {
+                core.setFailed("❌ A pull request already exists or the branch is invalid.");
+              } else {
+                core.setFailed(`❌ Error: ${error.message}`);
+              }
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          inputs: |
+            source_branch: ${{ github.event.inputs.source_branch }}
+            target_branch: ${{ github.event.inputs.target_branch }}
+            pr_title: ${{ github.event.inputs.pr_title }}
+            pr_body: ${{ github.event.inputs.pr_body }}
