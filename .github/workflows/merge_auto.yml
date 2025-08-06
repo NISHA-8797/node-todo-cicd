@@ -21,7 +21,7 @@ permissions:
   contents: write
   pull-requests: write
 env:
-  FEATURE_BRANCH: feature-geny_${{ github.run_id }}
+  FEATURE_BRANCH: feature-geny_$(date +%F)
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   create-feature-branch-from-target-branch:
