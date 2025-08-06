@@ -25,38 +25,45 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   create-feature-branch-from-target-branch:
-    if: inputs.Deployto == 'dev'
-    name: Setup Feature Branch and PR (Dev)
-    runs-on: ubuntu-latest
+      if: inputs.Deployto == 'dev'
+      name: Setup Feature Branch and PR (Dev)
+      runs-on: ubuntu-latest
 
-    steps:
+      steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+         token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Check if feature branch already exists
         id: check_branch
         run: |
-          if git ls-remote --exit-code --heads origin $FEATURE_BRANCH; then
-            echo "Branch already exists. Skipping creation."
-            echo "EXISTS=true" >> $GITHUB_ENV
-          else
-            echo "Branch does not exist. Will create."
-            echo "EXISTS=false" >> $GITHUB_ENV
-          fi
+         if git ls-remote --exit-code --heads origin $FEATURE_BRANCH; then
+          echo "Branch already exists. Skipping creation."
+          echo "exists=true" >> $GITHUB_OUTPUT
+         else
+          echo "Branch does not exist. Will create."
+          echo "exists=false" >> $GITHUB_OUTPUT
+         fi
+
       - name: Checkout target branch
-        if: env.EXISTS == 'false'
+        if: steps.check_branch.outputs.exists == 'false'
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.target_branch }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+         ref: ${{ github.event.inputs.target_branch }}
+         token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Configure Git
-        if: env.EXISTS == 'false'
+        if: steps.check_branch.outputs.exists == 'false'
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+         git config user.name "github-actions"
+         git config user.email "github-actions@github.com"
 
       - name: Create and push feature branch
-        if: env.EXISTS == 'false'
+        if: steps.check_branch.outputs.exists == 'false'
         run: |
-          git checkout -b $FEATURE_BRANCH
-          git push origin $FEATURE_BRANCH
+         git checkout -b $FEATURE_BRANCH
+         git push origin $FEATURE_BRANCH
 
   create-pr:
    if: inputs.Deployto == 'dev'
