@@ -11,7 +11,8 @@ on:
         description: 'Target branch (base)'
         required: true
         type: string
-
+env:       
+ GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 jobs:
   create-pr:
     runs-on: ubuntu-latest
