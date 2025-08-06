@@ -6,11 +6,11 @@ on:
       source_branch:
         description: 'Source branch (e.g., Branch A)'
         required: true
-        default: 'branch-a'
+        default: 'genx'
       target_branch:
         description: 'Target branch (e.g., Branch B)'
         required: true
-        default: 'branch-b'
+        default: 'geny'
       Deployto:
         type: environment
         description: 'Environment to deploy to (dev or qa)'
@@ -33,7 +33,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-         token: ${{ secrets.GITHUB_TOKEN }}
+         token: ${{ secrets.PERSONAL_TOKEN }}
 
       - name: Check if feature branch already exists
         id: check_branch
@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v4
         with:
          ref: ${{ github.event.inputs.target_branch }}
-         token: ${{ secrets.GITHUB_TOKEN }}
+         token: ${{ secrets.PERSONAL_TOKEN }}
 
       - name: Configure Git
         if: steps.check_branch.outputs.exists == 'false'
@@ -102,7 +102,7 @@ jobs:
         with:
           route: GET /repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 
       - name: Fail on conflict
         run: |
