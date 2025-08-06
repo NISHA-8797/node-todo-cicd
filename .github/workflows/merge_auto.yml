@@ -65,7 +65,7 @@ jobs:
          git checkout -b $FEATURE_BRANCH
          git push origin $FEATURE_BRANCH
 
-  create-pr-using-api:
+  create-pr:
    name: Create PR from genx → feature
    needs:   create-feature-branch-from-target-branch
    runs-on: ubuntu-latest
@@ -111,22 +111,20 @@ jobs:
             echo "❌ Merge conflict detected. Please resolve manually."
             exit 1
           fi
-  approval-dev-1:
-    if: inputs.Deployto == 'dev'
+  approval-1:
+    environment:
+          name: ${{ inputs.Deployto }}
+          url: https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }}
     name: Approval 1 - Code Review
     needs: check-mergeability-dev
     runs-on: ubuntu-latest
-    environment:
-      name: review-approval
-      url: https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }}
-
     steps:
       - run: echo "Awaiting approval"
 
-  approval-dev-2:
+  approval-2:
     if: inputs.Deployto == 'dev'
     name: Approval 2 - Merge Source into Feature
-    needs: approval-dev-1
+    needs: approval-1
     runs-on: ubuntu-latest
     environment:
       name: merge-approval
