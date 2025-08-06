@@ -65,13 +65,17 @@ jobs:
    outputs:
      pr_number: ${{ steps.save_pr.outputs.pr_number }}
    steps:
+    - name: checkout source branch
+      uses: actions/checkout@v4
+      with:
+        ref : ${{ github.event.inputs.source_branch }}
+        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Create Pull Request
       id: create_pr
       uses: peter-evans/create-pull-request@v6
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         base: ${{ env.FEATURE_BRANCH }}
-        ref: ${{ github.event.inputs.source_branch }}
         title: "PR: Merge '${{ github.event.inputs.source_branch }}' into '${{ env.FEATURE_BRANCH }}'"
         body: |
           Merging source branch into feature branch based on target `${{ github.event.inputs.target_branch }}`.
