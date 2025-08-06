@@ -64,7 +64,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         base: ${{ env.FEATURE_BRANCH }}
-        head: ${{ github.event.inputs.source_branch }}
+        ref: ${{ github.event.inputs.source_branch }}
         title: "PR: Merge '${{ github.event.inputs.source_branch }}' into '${{ env.FEATURE_BRANCH }}'"
         body: |
           Merging source branch into feature branch based on target `${{ github.event.inputs.target_branch }}`.
