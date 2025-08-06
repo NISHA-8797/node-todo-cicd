@@ -68,6 +68,7 @@ jobs:
   create-pr:
    if: inputs.Deployto == 'dev'
    name: Create PR from source → feature
+   needs: create-feature-branch-from-target-branch
    runs-on: ubuntu-latest
    outputs:
      pr_number: ${{ steps.save_pr.outputs.pr_number }}
