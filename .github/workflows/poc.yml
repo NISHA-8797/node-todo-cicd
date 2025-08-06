@@ -1,0 +1,41 @@
+name: Create Pull Request
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: 'Source branch'
+        required: true
+        default: 'feature-branch'
+      target_branch:
+        description: 'Target branch'
+        required: true
+        default: 'main'
+      pr_title:
+        description: 'Pull request title'
+        required: true
+        default: 'Automated PR from feature-branch'
+      pr_body:
+        description: 'Pull request body'
+        required: false
+        default: 'This PR was created automatically using a workflow.'
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.source_branch }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: ${{ github.event.inputs.target_branch }}
+          branch: ${{ github.event.inputs.source_branch }}
+          title: ${{ github.event.inputs.pr_title }}
+          body: ${{ github.event.inputs.pr_body }}
+          draft: false
