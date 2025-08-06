@@ -22,7 +22,7 @@ permissions:
   pull-requests: write
 env:
   FEATURE_BRANCH: feature-genx-geny-merge
-  GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 jobs:
   create-feature-branch-from-target-branch:
       if: inputs.Deployto == 'dev'
