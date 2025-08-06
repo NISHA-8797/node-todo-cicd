@@ -46,11 +46,5 @@ jobs:
                 core.setFailed(`❌ Error: ${error.message}`);
               }
             }
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          inputs: |
-            source_branch: ${{ github.event.inputs.source_branch }}
-            target_branch: ${{ github.event.inputs.target_branch }}
-            pr_title: ${{ github.event.inputs.pr_title }}
-            pr_body: ${{ github.event.inputs.pr_body }}
+env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
