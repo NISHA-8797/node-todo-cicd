@@ -96,7 +96,7 @@ jobs:
   check-mergeability-dev:
     if: inputs.Deployto == 'dev'
     name: Check Merge Conflicts (Dev)
-    needs: create-feature-branch-from-target-branch
+    needs: create-pr
     runs-on: ubuntu-latest
 
     steps:
