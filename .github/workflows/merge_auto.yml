@@ -89,45 +89,59 @@ jobs:
           });
           core.setOutput("pr_number", pullRequest.number);
 
-  check-mergeability-dev:
-    if: inputs.Deployto == 'dev'
-    name: Check Merge Conflicts (Dev)
-    needs: create-pr
+merge:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check PR mergeability
-        id: check_merge
-        uses: octokit/request-action@v2.x
-        with:
-          route: GET /repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}
-          GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+    - name: Checkout target branch
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.target_branch }}
+        fetch-depth: 0  # Fetch full history for merging
 
-      - name: Fail on conflict
-        run: |
-          echo "Mergeable: ${{ steps.check_merge.outputs.data__mergeable }}"
-          if [[ "${{ steps.check_merge.outputs.data__mergeable }}" != "true" ]]; then
-            echo "❌ Merge conflict detected. Please resolve manually."
-            exit 1
-          fi
-  approval-1:
+    - name: Configure Git
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+
+    - name: Add source branch
+      run: |
+        git fetch origin ${{ github.event.inputs.source_branch }}:${{ github.event.inputs.source_branch }}
+
+    - name: Merge source branch into target branch
+      id: merge
+      run: |
+        set -e
+        git merge origin/${{ github.event.inputs.source_branch }} --no-ff || echo "::set-output name=conflict::true"
+
+    - name: Check for merge conflict
+      if: steps.merge.outputs.conflict == 'true'
+      run: |
+        echo "⚠️ Merge conflict detected. Please resolve manually."
+        exit 1
+
+    - name: Push merged changes
+      if: steps.merge.outputs.conflict != 'true'
+      run: |
+        git push origin ${{ github.event.inputs.target_branch }}
+        echo "✅ Merge completed successfully."
+approval-1:
     environment:
           name: ${{ inputs.Deployto }}
-          url: https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }}
+         # url: https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }}
     name: Approval 1 - Code Review
-    needs: check-mergeability-dev
+    needs: merge
     runs-on: ubuntu-latest
     steps:
       - run: echo "Awaiting approval"
 
-  approval-2:
+approval-2:
     if: inputs.Deployto == 'dev'
     name: Approval 2 - Merge Source into Feature
     needs: approval-1
     runs-on: ubuntu-latest
     environment:
       name: merge-approval
-      url: https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }}
+      #url: https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }}
 
     steps:
       - run: echo "Awaiting final approval to merge source → feature branch."
