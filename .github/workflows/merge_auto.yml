@@ -68,7 +68,7 @@ jobs:
   create-pr:
    if: ${{ (inputs.Deployto == 'QA' || inputs.Deployto == 'dev' ) }}
    name: Create PR from source → feature
-   needs: ${{ inputs.Deplyto == 'dev' && 'create-feature-branch-from-master' || '' }}
+   needs: ${{ inputs.env == 'dev' && 'create-feature-branch-from-master' || '' }}
    runs-on: ubuntu-latest
    outputs:
      pr_number: ${{ steps.save_pr.outputs.pr_number }}
