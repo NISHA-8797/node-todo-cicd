@@ -26,7 +26,7 @@ env:
 jobs:
   create-feature-branch:
       if: inputs.Deployto == 'dev'
-      name: Create Feature Branch from GenY master
+      name: Create Feature Branch 
       runs-on: ubuntu-latest
 
       steps:
@@ -68,7 +68,7 @@ jobs:
   create-pull-request:
    needs: create-feature-branch
    if: inputs.Deployto == 'dev' || inputs.Deployto == 'QA' 
-   name: Create PR from source → feature
+   name: Create PR from source
    runs-on: ubuntu-latest
    outputs:
      pr_number: ${{ steps.save_pr.outputs.pr_number }}
