@@ -4,16 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       source_branch:
-        description: 'Source branch (e.g., Branch A)'
+        description: 'Source branch (Genx-GlobalMaster)'
         required: true
         default: 'genx'
       target_branch:
-        description: 'Target branch (e.g., Branch B)'
+        description: 'Target branch (GenY-na_master)'
         required: true
         default: 'geny'
       Deployto:
         type: environment
-        description: 'Environment to deploy to (dev or qa)'
+        description: 'Environment to deploy to '
         required: true
         default: 'dev'
 
@@ -21,10 +21,10 @@ permissions:
   contents: write
   pull-requests: write
 env:
-  FEATURE_BRANCH: feature-genx-geny-merge1
+  FEATURE_BRANCH: feature-genx-geny-merge
   GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 jobs:
-  create-feature-branch-from-master:
+  create-feature-branch:
       if: inputs.Deployto == 'dev'
       name: Create Feature Branch from GenY master
       runs-on: ubuntu-latest
@@ -66,7 +66,7 @@ jobs:
          git push origin $FEATURE_BRANCH
 
   create-pull-request:
-   needs: create-feature-branch-from-master
+   needs: create-feature-branch
    if: inputs.Deployto == 'dev' || inputs.Deployto == 'QA' 
    name: Create PR from source → feature
    runs-on: ubuntu-latest
@@ -144,6 +144,5 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: merge-approval
-      #url: https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }}
     steps:
       - run: echo "Awaiting final approval to merge source → feature branch."
