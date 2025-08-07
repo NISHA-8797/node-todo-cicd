@@ -66,9 +66,9 @@ jobs:
          git push origin $FEATURE_BRANCH
 
   create-pr:
-   if: ${{ (inputs.Deployto == 'QA' || inputs.Deployto == 'dev' ) }}
+   needs: create-feature-branch-from-master
+   if: ${{ inputs.Deployto == 'dev' || inputs.Deployto == 'QA' }}
    name: Create PR from source → feature
-   needs: ${{ inputs.env == 'dev' && 'create-feature-branch-from-master' || '' }}
    runs-on: ubuntu-latest
    outputs:
      pr_number: ${{ steps.save_pr.outputs.pr_number }}
