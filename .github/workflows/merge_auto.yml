@@ -66,7 +66,7 @@ jobs:
          git push origin $FEATURE_BRANCH
 
   create-pr:
-   if: inputs.Deployto == 'QA'
+   if: ${{ (inputs.Deployto == 'QA' || inputs.Deployto == 'dev' ) }}
    name: Create PR from source → feature
    needs: create-feature-branch-from-target-branch
    runs-on: ubuntu-latest
