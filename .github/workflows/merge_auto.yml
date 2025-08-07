@@ -1,4 +1,4 @@
-name: Auto Merge Branch A to B
+name: GenX-GenY_CodeMerge
 
 on:
   workflow_dispatch:
@@ -133,7 +133,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: merge
     environment:
-          name: review_approval
+          name: code_review_approval
          # url: https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }}
     steps:
       - run: echo "Have you reviwed the code and ready to deploy?"
