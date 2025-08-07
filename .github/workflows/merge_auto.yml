@@ -129,20 +129,11 @@ jobs:
       run: |
         git push origin ${{ github.event.inputs.target_branch }}
         echo "✅ Merge completed successfully."
-  Approve_code_review:
+  code_review-approval:
     runs-on: ubuntu-latest
     needs: merge
     environment:
-          name: ${{ inputs.Deployto }}
+          name: review_approval
          # url: https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }}
     steps:
       - run: echo "Have you reviwed the code and ready to deploy?"
-
-  approval-2:
-    name: Approval 2 - Merge Source into Feature
-    needs: Approve_code_review
-    runs-on: ubuntu-latest
-    environment:
-      name: merge-approval
-    steps:
-      - run: echo "Awaiting final approval to merge source → feature branch."
