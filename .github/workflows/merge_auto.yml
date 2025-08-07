@@ -21,7 +21,7 @@ permissions:
   contents: write
   pull-requests: write
 env:
-  FEATURE_BRANCH: feature-genx-geny-merge
+  FEATURE_BRANCH: feature-genx-geny-merge1
   GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 jobs:
   create-feature-branch-from-master:
