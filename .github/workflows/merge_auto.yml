@@ -24,7 +24,7 @@ env:
   FEATURE_BRANCH: feature-genx-geny-merge
   GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 jobs:
-  create-feature-branch-master:
+  create-feature-branch-from-master:
       if: inputs.Deployto == 'dev'
       name: Create Feature Branch from GenY master
       runs-on: ubuntu-latest
@@ -68,7 +68,7 @@ jobs:
   create-pr:
    if: ${{ (inputs.Deployto == 'QA' || inputs.Deployto == 'dev' ) }}
    name: Create PR from source → feature
- #  needs: create-feature-branch-from-master
+   needs: ${{ inputs.Deplyto == 'dev' && 'create-feature-branch-from-master' || '' }}
    runs-on: ubuntu-latest
    outputs:
      pr_number: ${{ steps.save_pr.outputs.pr_number }}
