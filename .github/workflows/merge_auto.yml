@@ -65,9 +65,9 @@ jobs:
          git checkout -b $FEATURE_BRANCH
          git push origin $FEATURE_BRANCH
 
-  create-pr:
+  create-pull-request:
    needs: create-feature-branch-from-master
-   if: ${{ inputs.Deployto == 'dev' || inputs.Deployto == 'QA' }}
+   if: inputs.Deployto == 'dev' || inputs.Deployto == 'QA' 
    name: Create PR from source → feature
    runs-on: ubuntu-latest
    outputs:
@@ -95,7 +95,7 @@ jobs:
   merge:
     if: ${{ (inputs.Deployto == 'QA' || inputs.Deployto == 'dev' ) }}
     runs-on: ubuntu-latest
-    needs: create-pr
+    needs: create-pull-request
     steps:
     - name: Checkout target branch
       uses: actions/checkout@v4
